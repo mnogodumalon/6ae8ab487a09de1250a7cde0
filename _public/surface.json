@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "pages": [
+    {
+      "slug": "termin-abstimmen",
+      "component": "TerminAbstimmen",
+      "title": "Termin abstimmen",
+      "endpoints": [
+        {
+          "entity": "umfragen",
+          "op": "list",
+          "fields": [
+            "titel",
+            "beschreibung",
+            "ort",
+            "antwortfrist"
+          ],
+          "scope": "r.v_status == 'laeuft'",
+          "scope_description": "zeigt nur Umfragen mit Status „läuft“",
+          "max_records": 200
+        },
+        {
+          "entity": "terminvorschlaege",
+          "op": "list",
+          "fields": [
+            "umfrage",
+            "bezeichnung",
+            "beginn",
+            "ende"
+          ],
+          "scope": "r.v_beginn >= now()",
+          "scope_description": "zeigt nur Terminvorschläge, die noch nicht begonnen haben",
+          "max_records": 500
+        },
+        {
+          "entity": "personen",
+          "op": "list",
+          "fields": [
+            "vorname",
+            "nachname"
+          ],
+          "max_records": 500
+        },
+        {
+          "entity": "einladungen_und_antworten",
+          "op": "create",
+          "fields": [
+            "umfrage",
+            "person",
+            "passende_termine",
+            "kommentar",
+            "antwortdatum"
+          ],
+          "preset_fields": {
+            "einladungsstatus": "beantwortet"
+          }
+        },
+        {
+          "entity": "einladungen_und_antworten",
+          "op": "list",
+          "fields": [
+            "person"
+          ],
+          "purpose": "availability"
+        }
+      ]
+    }
+  ]
+}
