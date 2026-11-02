@@ -1,0 +1,33 @@
+{
+  "PersonenDialog.tsx": {
+    "vorname": "z. B. Anna",
+    "nachname": "z. B. Müller",
+    "email": "z. B. anna.mueller@beispiel.de",
+    "organisation": "z. B. Muster GmbH",
+    "notiz": "Was ist wichtig zu wissen?"
+  },
+  "UmfragenDialog.tsx": {
+    "titel": "z. B. Teamabend im Mai",
+    "beschreibung": "Worum geht es bei der Umfrage?",
+    "ort": "z. B. Restaurant Adler, Berlin",
+    "antwortfrist": "Bis wann sollen alle antworten?",
+    "ergebnis_hinweis": "Was gilt für das Ergebnis?",
+    "gewaehlter_termin": "Welcher Termin wurde gewählt?"
+  },
+  "TerminvorschlaegeDialog.tsx": {
+    "umfrage": "Welche Umfrage?",
+    "bezeichnung": "z. B. Freitagabend im Café",
+    "beginn": "Wann beginnt der Termin?",
+    "ende": "Wann endet der Termin?",
+    "anzahl_zusagen": "z. B. 5"
+  },
+  "EinladungenUndAntwortenDialog.tsx": {
+    "person": "Welche Person?",
+    "versanddatum": "Wann wurde die Einladung gesendet?",
+    "antwortlink": "z. B. https://termin.de/abc123",
+    "antwortdatum": "Wann kam die Antwort?",
+    "kommentar": "Anmerkungen zur Antwort",
+    "umfrage": "Welche Umfrage?",
+    "passende_termine": "Welche Termine passen?"
+  }
+}

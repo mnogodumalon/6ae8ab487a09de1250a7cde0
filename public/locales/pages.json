@@ -1,0 +1,39 @@
+{
+  "pages": {
+    "en": {
+      "Ablauf geöffnet — Statuswechsel dort bestätigen": "Workflow opened — confirm status change there",
+      "Alle Eingeladenen haben geantwortet.": "All invitees have responded.",
+      "Alle Umfragen sind auf Kurs.": "All polls are on track.",
+      "Als Nächstes endet die Frist von {0} am {1}.": "Next, the deadline of {0} ends on {1}.",
+      "Antwort erfassen": "Record response",
+      "Einladungen nach Status": "Invitations by status",
+      "Erste Umfrage anlegen": "Create first poll",
+      "Frist {0}": "Deadline {0}",
+      "Kein Termin gewählt": "No date chosen",
+      "Keine offen": "None open",
+      "Laufende Umfragen": "Active polls",
+      "Lege deine erste Terminumfrage an.": "Create your first scheduling poll.",
+      "Neue Umfrage": "New poll",
+      "Noch keine Terminumfrage — lege eine an, schlage Termine vor und lade Personen ein.": "No scheduling polls yet — create one, propose dates, and invite people.",
+      "Nächste Frist": "Next deadline",
+      "Offene Einladungen": "Open invitations",
+      "Ohne Frist": "No deadline",
+      "Ohne Titel": "Untitled",
+      "Ohne gewählten Termin": "No date chosen",
+      "Sobald Zusagen eingehen, siehst du hier den Favoriten je Umfrage.": "Once acceptances come in, you'll see the favorite for each poll here.",
+      "Statuswechsel bitte im Ablauf bestätigen": "Please confirm status change in the workflow",
+      "Termin wählen": "Choose date",
+      "Termine mit den meisten Zusagen": "Dates with the most acceptances",
+      "Umfrage öffnen": "Open poll",
+      "Vorn liegt „{0}“ mit {1} Zusagen.": "\"{0}\" is in the lead with {1} acceptances.",
+      "Wartet auf Antwort": "Awaiting response",
+      "Wählen": "Choose",
+      "{0} haben noch nicht geantwortet.": "{0} have not responded yet.",
+      "{0} von {1} Zusagen": "{0} of {1} acceptances",
+      "{0}/{1} Antworten": "{0}/{1} responses",
+      "{0}: Frist abgelaufen, noch kein Termin gewählt.": "{0}: Deadline passed, no date chosen yet.",
+      "— Antwortfrist abgelaufen ({0}), aber noch kein Termin gewählt.": "— Response deadline passed ({0}), but no date chosen yet."
+    }
+  },
+  "v": 1
+}

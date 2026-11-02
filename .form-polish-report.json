@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "Personen": {
+      "placeholders_set": 5,
+      "defaults_keys": [],
+      "computed_keys": [],
+      "reason": "Reine Stammdaten von Personen ohne numerische Felder, daher keine Formeln oder Standardwerte."
+    },
+    "Umfragen": {
+      "placeholders_set": 6,
+      "defaults_keys": [
+        "status",
+        "antwortfrist"
+      ],
+      "computed_keys": [],
+      "reason": "Keine Formel, da es keine Datumspaare oder Mengen gibt und die Anzahl der Zusagen nur ein Zahlenfeld der Terminvorschläge ist, das nicht berechnet werden muss."
+    },
+    "Terminvorschläge": {
+      "placeholders_set": 5,
+      "defaults_keys": [
+        "beginn",
+        "anzahl_zusagen"
+      ],
+      "computed_keys": [
+        "_termin_dauer_stunden"
+      ],
+      "reason": "Beginn und Ende bilden ein Datumspaar, daher wird die Dauer in Stunden als virtuelles Feld berechnet; ein Preis über applookup existiert nicht, die Zusagen werden manuell erfasst."
+    },
+    "Einladungen und Antworten": {
+      "placeholders_set": 7,
+      "defaults_keys": [
+        "versanddatum",
+        "einladungsstatus"
+      ],
+      "computed_keys": [],
+      "reason": "Keine Formel, da es keine Datumspaare oder Preisfelder gibt und anzahl_zusagen nur als Zählwert der Termine existiert, ohne sinnvolle Berechnung."
+    }
+  }
+}

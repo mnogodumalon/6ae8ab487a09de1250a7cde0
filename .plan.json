@@ -1,0 +1,284 @@
+{
+  "version": 1,
+  "language": "de",
+  "understanding": {
+    "summary": "Du baust eine Terminumfrage: Personen werden einmal als Stammdaten angelegt. Zu einer Umfrage mit Titel, Ort und Antwortfrist legst du mehrere Terminvorschläge an und lädst Personen ein. Eingeladene antworten ohne Login über eine öffentliche Seite, wählen ihre passenden Termine (mehrere möglich) und können einen Kommentar hinterlassen. Je Termin wird gezählt, wie viele zusagen. Der Termin mit den meisten Zusagen wird als gewählter Termin an der Umfrage eingetragen. Der Versand von Links und Ergebnis-Mails an die Teilnehmer ist hier nicht möglich und wird in den offenen Fragen behandelt.",
+    "outside_users": [
+      {
+        "who": "Teilnehmer",
+        "does": "wählen ihre Umfrage, tragen sich ein und geben an, welche Termine passen, mit Kommentar"
+      }
+    ],
+    "roles": [
+      "Organisator",
+      "Teilnehmer"
+    ],
+    "main_tasks": [
+      "Personen als Stammdaten pflegen",
+      "Umfrage mit Terminvorschlägen anlegen",
+      "Personen zur Umfrage einladen",
+      "Antworten der Teilnehmer erfassen und auswerten",
+      "Termin mit den meisten Zusagen wählen"
+    ],
+    "platform_roles": [
+      {
+        "persona": "Organisator",
+        "role": "datenverarbeitung",
+        "apps": [
+          "personen",
+          "umfragen",
+          "terminvorschlaege",
+          "einladungen_und_antworten"
+        ]
+      }
+    ],
+    "wish_kind": "plain",
+    "wish_signals": []
+  },
+  "flows": [
+    {
+      "slug": "umfrage-anlegen",
+      "label": {
+        "de": "Umfrage mit Terminen anlegen",
+        "en": "Create survey with dates"
+      },
+      "description": "Der Organisator legt eine Umfrage an und erfasst gleich mehrere Terminvorschläge dazu.",
+      "priority": "must",
+      "writes": [
+        {
+          "entity": "umfragen",
+          "op": "create",
+          "when": "always",
+          "fields": {
+            "titel": "user",
+            "beschreibung": "user",
+            "ort": "user",
+            "antwortfrist": "user",
+            "status": "fixed:entwurf"
+          },
+          "multiple": false,
+          "needs": {}
+        },
+        {
+          "entity": "terminvorschlaege",
+          "op": "create",
+          "when": "always",
+          "fields": {
+            "umfrage": "picked",
+            "bezeichnung": "user",
+            "beginn": "user",
+            "ende": "user"
+          },
+          "multiple": true,
+          "needs": {}
+        }
+      ],
+      "required": [
+        "terminvorschlaege.umfrage"
+      ],
+      "brief": "# Flow `umfrage-anlegen` — Umfrage mit Terminen anlegen\nDer Organisator legt eine Umfrage an und erfasst gleich mehrere Terminvorschläge dazu.\n\n## Your hook — import it, never rebuild what it owns\n`import { useUmfrageAnlegenFlow } from '@/lib/journey/flows/UmfrageAnlegen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick: umfrage), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n1. Titel, Beschreibung, Ort und Antwortfrist der Umfrage eingeben\n2. Mehrere Terminvorschläge mit Bezeichnung, Beginn und Ende erfassen\n3. Umfrage prüfen und speichern\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- creates `umfragen`:\n    - `titel`: the user enters it (bind it through the layer: form.field/…)\n    - `beschreibung`: the user enters it (bind it through the layer: form.field/…)\n    - `ort`: the user enters it (bind it through the layer: form.field/…)\n    - `antwortfrist`: the user enters it (bind it through the layer: form.field/…)\n    - `status`: fixed value `entwurf` — set it in the plan step's values, never ask\n- creates `terminvorschlaege` — SEVERAL per run: `flow.lists.terminvorschlaege` holds the entries (add/remove/edit), render the editor's fields inside `<ListEntries list={flow.lists.terminvorschlaege}>` on their own step; the plan creates one record per entry:\n    - `umfrage`: from the record the user picks in this flow — **REQUIRED in this flow** (mark it required and validate it before the step advances, whatever the app's base view says): tool `zusagen-zaehlen` → `anzahl_zusagen`, tool `zusagen-neu-zaehlen` → `anzahl_zusagen` cannot be built without it\n    - `bezeichnung`: the user enters it (bind it through the layer: form.field/…)\n    - `beginn`: the user enters it (bind it through the layer: form.field/…)\n    - `ende`: the user enters it (bind it through the layer: form.field/…)\n\n## Success page\n- shows: `umfragen.titel`, `terminvorschlaege.bezeichnung`\n- next flows to offer: `personen-einladen`\n\n## Never write these — another flow or a tool owns them\n- `einladungen_und_antworten.umfrage` (owner: intent `personen-einladen`)\n- `einladungen_und_antworten.person` (owner: intent `personen-einladen`)\n- `einladungen_und_antworten.einladungsstatus` (owner: intent `personen-einladen`)\n- `einladungen_und_antworten.versanddatum` (owner: intent `personen-einladen`)\n- `umfragen.gewaehlter_termin` (owner: intent `termin-waehlen`)\n- `umfragen.ergebnis_hinweis` (owner: intent `termin-waehlen`)\n- `terminvorschlaege.anzahl_zusagen` (owner: tool `zusagen-zaehlen`)\n"
+    },
+    {
+      "slug": "personen-einladen",
+      "label": {
+        "de": "Personen zur Umfrage einladen",
+        "en": "Invite people to survey"
+      },
+      "description": "Der Organisator verknüpft eine Umfrage mit mehreren Personen, die eingeladen werden, und startet die Umfrage.",
+      "priority": "must",
+      "writes": [
+        {
+          "entity": "einladungen_und_antworten",
+          "op": "create",
+          "when": "always",
+          "fields": {
+            "umfrage": "picked",
+            "person": "picked",
+            "einladungsstatus": "fixed:offen",
+            "versanddatum": "derived:now"
+          },
+          "multiple": true,
+          "needs": {}
+        },
+        {
+          "entity": "umfragen",
+          "op": "update",
+          "when": "optional",
+          "fields": {
+            "status": "fixed:laeuft"
+          },
+          "multiple": false,
+          "needs": {}
+        }
+      ],
+      "required": [],
+      "brief": "# Flow `personen-einladen` — Personen zur Umfrage einladen\nDer Organisator verknüpft eine Umfrage mit mehreren Personen, die eingeladen werden, und startet die Umfrage.\n\n## Your hook — import it, never rebuild what it owns\n`import { usePersonenEinladenFlow } from '@/lib/journey/flows/PersonenEinladen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick: umfrage, person), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `umfragen`: `{...flow.picks.umfragen.select} {...flow.pick('umfragen')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n1. Umfrage auswählen\n2. Mehrere Personen aus den Stammdaten auswählen\n3. Einladungen mit Status Offen anlegen und Umfrage auf Läuft setzen\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- creates `einladungen_und_antworten` — SEVERAL per run: `flow.lists.einladungen_und_antworten` holds the entries (add/remove/edit), render the editor's fields inside `<ListEntries list={flow.lists.einladungen_und_antworten}>` on their own step; the plan creates one record per entry:\n    - `umfrage`: from the record the user picks in this flow\n    - `person`: from the record the user picks in this flow\n    - `einladungsstatus`: fixed value `offen` — set it in the plan step's values, never ask\n    - `versanddatum`: derived: now() — set it in the plan step, never ask\n- updates `umfragen` (only when the flow needs it):\n    - `status`: fixed value `laeuft` — set it in the plan step's values, never ask\n\n## Reads\n- `umfragen` columns titel, antwortfrist, status\n- `personen` columns vorname, nachname, email, organisation\n\n## Checks BEFORE the write (block the submit with the message when they fail)\n- unique (field=`einladungen_und_antworten.person`) — message: „Diese Person ist zu dieser Umfrage bereits eingeladen.“\n\n## Success page\n- shows: `einladungen_und_antworten.person`, `einladungen_und_antworten.einladungsstatus`\n- next flows to offer: `termin-waehlen`\n\n## Never write these — another flow or a tool owns them\n- `umfragen.titel` (owner: intent `umfrage-anlegen`)\n- `umfragen.beschreibung` (owner: intent `umfrage-anlegen`)\n- `umfragen.ort` (owner: intent `umfrage-anlegen`)\n- `umfragen.antwortfrist` (owner: intent `umfrage-anlegen`)\n- `terminvorschlaege.umfrage` (owner: intent `umfrage-anlegen`)\n- `terminvorschlaege.bezeichnung` (owner: intent `umfrage-anlegen`)\n- `terminvorschlaege.beginn` (owner: intent `umfrage-anlegen`)\n- `terminvorschlaege.ende` (owner: intent `umfrage-anlegen`)\n- `umfragen.gewaehlter_termin` (owner: intent `termin-waehlen`)\n- `umfragen.ergebnis_hinweis` (owner: intent `termin-waehlen`)\n- `terminvorschlaege.anzahl_zusagen` (owner: tool `zusagen-zaehlen`)\n"
+    },
+    {
+      "slug": "termin-waehlen",
+      "label": {
+        "de": "Termin mit meisten Zusagen wählen",
+        "en": "Choose date with most votes"
+      },
+      "description": "Der Organisator sieht je Terminvorschlag die Zusagen, übernimmt den Termin mit den meisten Zusagen und schließt die Umfrage ab.",
+      "priority": "must",
+      "writes": [
+        {
+          "entity": "umfragen",
+          "op": "update",
+          "when": "always",
+          "fields": {
+            "gewaehlter_termin": "picked",
+            "ergebnis_hinweis": "user",
+            "status": "fixed:abgeschlossen"
+          },
+          "multiple": false,
+          "needs": {}
+        }
+      ],
+      "required": [],
+      "brief": "# Flow `termin-waehlen` — Termin mit meisten Zusagen wählen\nDer Organisator sieht je Terminvorschlag die Zusagen, übernimmt den Termin mit den meisten Zusagen und schließt die Umfrage ab.\n\n## Your hook — import it, never rebuild what it owns\n`import { useTerminWaehlenFlow } from '@/lib/journey/flows/TerminWaehlen';` — generated from the Schreibliste below. It OWNS the form(s), one record search per picked field (columns and filter from the plan) and the submit plan with every fixed and derived value. You compose: `flow.forms.<entity>` for <Bound>/<Field>, `{...flow.picks.<field>.select} {...flow.pick('<field>')}` (or `flow.pickMany` for a multi pick) for <EntitySelectStep>, `flow.validateStep(n)` in StepNav.onNext, `flow.submit` + `flow.formList` for SummaryStep/SuccessStep, `flow.reset()`; what the hook does not own reads through its door `flow.port` — availability `useOccupancy(flow.port, '<entity>', { resource })`, a count `useRecordCount(flow.port, …)` — never import servicePort next to the hook. Options: `steps` (field → step), `items` (how a hit reads, per pick: gewaehlter_termin), `initial`, `messages`. The hook's docblock in .lane-context.md shows the exact call. This flow CHANGES a record of `umfragen`: `{...flow.picks.umfragen.select} {...flow.pick('umfragen')}` picks it, the hook prefills the form with its current values and updates THAT record — never a create step, never a list from useDashboardData. Never import servicePort, useStepForm, useJourneySubmit, useRecordSearch or useDashboardData in this page — check-intents refuses a page that uses the hook and any of them.\n\n## Steps (in this order)\n1. Umfrage auswählen\n2. Terminvorschläge mit Anzahl der Zusagen ansehen\n3. Termin mit den meisten Zusagen als gewählten Termin übernehmen\n4. Hinweis zum Ergebnis eintragen und Umfrage abschließen\n\n## Schreibliste — the ONLY writes this flow makes (the gate compares your plan steps with this list)\n- updates `umfragen`:\n    - `gewaehlter_termin`: from the record the user picks in this flow\n    - `ergebnis_hinweis`: the user enters it (bind it through the layer: form.field/…)\n    - `status`: fixed value `abgeschlossen` — set it in the plan step's values, never ask\n\n## Reads\n- `terminvorschlaege` columns bezeichnung, beginn, ende, anzahl_zusagen\n- `einladungen_und_antworten` columns person, einladungsstatus, passende_termine, kommentar\n\n## Success page\n- shows: `umfragen.gewaehlter_termin`, `umfragen.status`\n\n## Never write these — another flow or a tool owns them\n- `umfragen.titel` (owner: intent `umfrage-anlegen`)\n- `umfragen.beschreibung` (owner: intent `umfrage-anlegen`)\n- `umfragen.ort` (owner: intent `umfrage-anlegen`)\n- `umfragen.antwortfrist` (owner: intent `umfrage-anlegen`)\n- `terminvorschlaege.umfrage` (owner: intent `umfrage-anlegen`)\n- `terminvorschlaege.bezeichnung` (owner: intent `umfrage-anlegen`)\n- `terminvorschlaege.beginn` (owner: intent `umfrage-anlegen`)\n- `terminvorschlaege.ende` (owner: intent `umfrage-anlegen`)\n- `einladungen_und_antworten.umfrage` (owner: intent `personen-einladen`)\n- `einladungen_und_antworten.person` (owner: intent `personen-einladen`)\n- `einladungen_und_antworten.einladungsstatus` (owner: intent `personen-einladen`)\n- `einladungen_und_antworten.versanddatum` (owner: intent `personen-einladen`)\n- `terminvorschlaege.anzahl_zusagen` (owner: tool `zusagen-zaehlen`)\n"
+    }
+  ],
+  "public_pages": [
+    {
+      "slug": "termin-abstimmen",
+      "purpose": "Teilnehmer wählen ihre laufende Umfrage, sehen deren Terminvorschläge, tragen ihre Person ein, kreuzen mehrere passende Termine an und können einen Kommentar hinterlassen.",
+      "publish": true,
+      "lists": [
+        {
+          "entity": "umfragen",
+          "columns": [
+            "titel",
+            "beschreibung",
+            "ort",
+            "antwortfrist"
+          ],
+          "filter": {
+            "mode": "all",
+            "conditions": [
+              {
+                "field": "status",
+                "op": "eq",
+                "value": "laeuft"
+              }
+            ]
+          },
+          "max_records": null
+        },
+        {
+          "entity": "terminvorschlaege",
+          "columns": [
+            "umfrage",
+            "bezeichnung",
+            "beginn",
+            "ende"
+          ],
+          "filter": {
+            "mode": "all",
+            "conditions": [
+              {
+                "field": "beginn",
+                "op": "gte",
+                "value": {
+                  "rel": "today"
+                }
+              }
+            ]
+          },
+          "max_records": null
+        },
+        {
+          "entity": "personen",
+          "columns": [
+            "vorname",
+            "nachname"
+          ],
+          "filter": null,
+          "max_records": null
+        }
+      ],
+      "creates": [
+        {
+          "entity": "einladungen_und_antworten",
+          "fields": {
+            "umfrage": "picked",
+            "person": "picked",
+            "passende_termine": "picked",
+            "kommentar": "user",
+            "antwortdatum": "derived:now"
+          },
+          "fixed": {
+            "einladungsstatus": "beantwortet"
+          }
+        }
+      ],
+      "brief": "# Public page `termin-abstimmen`\nTeilnehmer wählen ihre laufende Umfrage, sehen deren Terminvorschläge, tragen ihre Person ein, kreuzen mehrere passende Termine an und können einen Kommentar hinterlassen.\n\n## Lists (declare exactly these in the surface)\n- `umfragen`: columns `titel`, `beschreibung`, `ort`, `antwortfrist`, filter {\"mode\": \"all\", \"conditions\": [{\"field\": \"status\", \"op\": \"eq\", \"value\": \"laeuft\"}]}\n- `terminvorschlaege`: columns `umfrage`, `bezeichnung`, `beginn`, `ende`, filter {\"mode\": \"all\", \"conditions\": [{\"field\": \"beginn\", \"op\": \"gte\", \"value\": {\"rel\": \"today\"}}]}\n- `personen`: columns `vorname`, `nachname`\n\n## Creates (declare exactly these in the surface)\n- `einladungen_und_antworten`: visitor fields `umfrage`, `person`, `passende_termine`, `kommentar`, `antwortdatum`; preset_fields {\"einladungsstatus\": \"beantwortet\"}\n\n## Availability — mechanical, write nothing for it\nA picker (`useRecordSearch`) never offers a record another record already takes (a booked slot) — the layer leaves it out. To SHOW booked periods, call `useOccupancy(port, '<entity>')` and hand `blocked` to AvailabilityRangePicker; the integration gives the page exactly that read (dates or the reference, never who booked). Never declare a list of bookings with names or contacts to work availability out yourself.\n\nPublish: yes\n"
+    }
+  ],
+  "tools": [
+    {
+      "id": "zusagen-zaehlen",
+      "purpose": "Zählt je Terminvorschlag, in wie vielen Einladungen und Antworten er unter den passenden Terminen steht, und schreibt die Zahl in die Anzahl der Zusagen. Läuft bei jeder Änderung einer Antwort, die Umfrage der Antwort bestimmt die betroffenen Terminvorschläge."
+    },
+    {
+      "id": "zusagen-neu-zaehlen",
+      "purpose": "Zählt die Zusagen neu, wenn eine Antwort geändert wird, etwa durch den Organisator. Reagiert auf jede Änderung einer Antwort."
+    },
+    {
+      "id": "antwortfrist-abschliessen",
+      "purpose": "Setzt laufende Umfragen, deren Antwortfrist vorbei ist, auf Abgeschlossen. Der gewählte Termin wird weiter vom Organisator im Ablauf übernommen."
+    }
+  ],
+  "covered_by_platform": [
+    {
+      "wish": "Alles zu Personen als Stammdaten anlegen",
+      "feature": "record_form"
+    },
+    {
+      "wish": "Liste der Termine und Antworten ansehen",
+      "feature": "list_page"
+    },
+    {
+      "wish": "Antworten je Termin auszählen",
+      "feature": "distribution_view"
+    }
+  ],
+  "ownership": {
+    "umfragen": {
+      "titel": "intent:umfrage-anlegen",
+      "beschreibung": "intent:umfrage-anlegen",
+      "ort": "intent:umfrage-anlegen",
+      "antwortfrist": "intent:umfrage-anlegen",
+      "status": "tool:antwortfrist-abschliessen",
+      "gewaehlter_termin": "intent:termin-waehlen",
+      "ergebnis_hinweis": "intent:termin-waehlen"
+    },
+    "terminvorschlaege": {
+      "umfrage": "intent:umfrage-anlegen",
+      "bezeichnung": "intent:umfrage-anlegen",
+      "beginn": "intent:umfrage-anlegen",
+      "ende": "intent:umfrage-anlegen",
+      "anzahl_zusagen": "tool:zusagen-neu-zaehlen"
+    },
+    "einladungen_und_antworten": {
+      "umfrage": "intent:personen-einladen",
+      "person": "intent:personen-einladen",
+      "einladungsstatus": "intent:personen-einladen",
+      "versanddatum": "intent:personen-einladen"
+    }
+  },
+  "dashboard": {
+    "focus": [
+      "Laufende Umfragen mit Antwortfrist",
+      "Offene Einladungen",
+      "Terminvorschläge mit den meisten Zusagen"
+    ],
+    "hints": [
+      "Einladungen nach Status zeigen",
+      "Umfragen ohne gewählten Termin hervorheben"
+    ],
+    "writes": [],
+    "wishes": []
+  }
+}

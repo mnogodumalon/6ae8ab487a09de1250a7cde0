@@ -1,0 +1,9 @@
+Ich möchte eine Terminumfrage bauen. Drei Kernbereiche wurden mir empfohlen: Personen, Umfragen und Einladungen/Antworten.
+Der Prozess ist: Zunächst anlegen aller Stammdaten: Alles zu Personen, die potentiell eingeladen werden können oder neue Teilnehmer sind.
+Dann Anlegen einer Umfrage
+Dann Verknüpfung von Umfrage mit einzuladenden Personen.
+Erstellung von Terminen und Verknüpfung mit einer Umfrage
+Versand eines Links zu den beiden Terminen mit Abfrage, "...welcher passt?..."
+Die Antwort, durch Link ausgewählt vom angeschriebenen Teilnehmer, aufnehmen und in der Liste der alternativen Terminen anzeigen.
+Termin mit den meisten Überschneidungen wird gewählt. 
+Erneuter Versand eines E-Mails mit dem insgesamt gefundenen Termin.
